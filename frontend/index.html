@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Stress Detection System | AR Developers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <!-- Light Theme Background Blobs -->
+    <div class="blob-bg"></div>
+    <div class="blob-bg blob-2"></div>
+
+    <div class="main-wrapper">
+        <!-- Navigation Bar -->
+        <nav class="glass-nav">
+            <div class="nav-brand">
+                <div class="pulse-ring"></div>
+                <h2>Stress<span class="highlight">Detect</span></h2>
+            </div>
+            <ul class="nav-links">
+                <li><button class="nav-btn active" data-target="home">Home</button></li>
+                <li><button class="nav-btn" data-target="analyze">Analyze</button></li>
+                <li><button class="nav-btn" data-target="company">AR Developers</button></li>
+                <li><button class="nav-btn" data-target="contact">Contact</button></li>
+            </ul>
+        </nav>
+
+        <div class="container">
+            <!-- Home Tab -->
+            <section id="home" class="tab-content active-tab glass-panel">
+                <div class="home-header">
+                    <h1>Welcome to the Future of Well-being</h1>
+                    <blockquote class="quote">
+                        "Stress is not what happens to us. It's our response to what happens. And response is something
+                        we can choose."
+                    </blockquote>
+                </div>
+
+                <div class="description-content">
+                    <p>
+                        Welcome to the <strong>AI Stress Detection System</strong>, a state-of-the-art machine learning
+                        platform designed to proactively monitor and analyze your psychological well-being.
+                    </p>
+                    <p>
+                        Our predictive model analyzes your sleep quality (PSQI), physical responses (Skin Conductance),
+                        and daily habits (Screen Time &amp; Call Duration) to instantly identify signs of elevated
+                        stress. With industry-leading accuracy powered by Advanced ML Algorithms, we help you take
+                        control of your health before stress takes control of you.
+                    </p>
+                    <button class="btn-glow go-analyze-btn"
+                        onclick="document.querySelector('[data-target=analyze]').click()">Start Analysis</button>
+                </div>
+            </section>
+
+            <!-- Analyze Tab -->
+            <section id="analyze" class="tab-content glass-panel">
+                <div class="section-header">
+                    <h2>Stress Level Analysis</h2>
+                    <p class="subtitle">Enter your metrics below for an instant evaluation.</p>
+                </div>
+
+                <form id="prediction-form">
+                    <!-- Row 1: PSQI + Skin Conductance (with calculators) -->
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <input type="number" id="psqi" step="any" min="0" max="21" required placeholder=" ">
+                            <label for="psqi">PSQI Score (0–21)</label>
+                            <span class="tooltip">Pittsburgh Sleep Quality Index (0-21)</span>
+                            <button type="button" class="btn-calc" onclick="openModal('psqi-modal')">Calculate</button>
+                            <div class="calc-badge hidden" id="psqi-badge"></div>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="number" id="skin_cond" step="any" min="0" required placeholder=" ">
+                            <label for="skin_cond">Skin Conductance (μS)</label>
+                            <span class="tooltip">Estimated via symptom questionnaire</span>
+                            <button type="button" class="btn-calc" onclick="openModal('skin-modal')">Calculate</button>
+                            <div class="calc-badge hidden" id="skin-badge"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <input type="number" id="call_dur" step="any" min="0" required placeholder=" ">
+                            <label for="call_dur">Call Duration (minutes)</label>
+                            <span class="tooltip">Total call time today in minutes</span>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="number" id="screen_time" step="any" min="0" required placeholder=" ">
+                            <label for="screen_time">Screen Time (hours)</label>
+                            <span class="tooltip">Total daily screen on time in hours</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="analyze-btn" class="btn-glow">
+                        <span class="btn-text">Run ML Analysis</span>
+                        <div class="loader hidden"></div>
+                    </button>
+                </form>
+
+                <!-- Results Container -->
+                <div id="result-container" class="result-container hidden">
+                    <div class="result-card">
+                        <div class="result-icon" id="result-icon">
+                            <!-- Filled dynamically by JS -->
+                        </div>
+                        <h2 id="result-title">Result</h2>
+                        <p id="result-msg">Message here</p>
+
+                        <!-- Computed Score Summary -->
+                        <div class="score-summary" id="score-summary"></div>
+
+                        <!-- Health Suggestions Box -->
+                        <div class="suggestions-box" id="suggestions-box">
+                            <h3>Health Recommendations</h3>
+                            <ul id="suggestions-list">
+                                <!-- Filled dynamically by JS -->
+                            </ul>
+                        </div>
+
+                        <div class="model-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">Model Engine</span>
+                                <span class="stat-value" id="model-name">Random Forest</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">System Accuracy</span>
+                                <span class="stat-value highlight" id="model-acc">--%</span>
+                            </div>
+                        </div>
+
+                        <button class="btn-reset" id="reset-btn">Run Another Analysis</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Company Tab -->
+            <section id="company" class="tab-content glass-panel">
+                <div class="company-profile">
+                    <div class="company-logo">AR</div>
+                    <h2>AR Developers</h2>
+                    <p class="tagline">Innovating the Future Through Intelligence.</p>
+
+                    <div class="description-content">
+                        <p>
+                            <strong>AR Developers</strong> is a premier software engineering and artificial intelligence
+                            firm dedicated to building cutting-edge technological solutions.
+                        </p>
+                        <p>
+                            Specializing in Machine Learning, predictive analytics, and scalable web architectures, we
+                            transform complex data into intuitive, life-changing applications. From corporate
+                            infrastructures to consumer-facing health tech, AR Developers delivers excellence,
+                            precision, and state-of-the-art design in every project.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Tab -->
+            <section id="contact" class="tab-content glass-panel">
+                <div class="section-header">
+                    <h2>Get In Touch</h2>
+                    <p class="subtitle">Reach out to AR Developers for inquiries, collaborations, or support.</p>
+                </div>
+
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <div class="icon-circle phone-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="contact-info">
+                            <span class="label">Phone</span>
+                            <span class="value">03099902068</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="icon-circle email-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                </path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="contact-info">
+                            <span class="label">Email</span>
+                            <span class="value">mahmadramzan06@gmail.com</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <footer>
+            <p>&copy; 2026 <strong>AR Developers</strong>. Powered by Advanced Machine Learning.</p>
+        </footer>
+    </div>
+
+    <!-- ===================== PSQI CALCULATOR MODAL ===================== -->
+    <div id="psqi-modal" class="modal hidden">
+        <div class="modal-content glass-panel modal-wide">
+            <span class="close-btn" onclick="closeModal('psqi-modal')">&times;</span>
+            <h2>🌙 PSQI Score Calculator</h2>
+            <p class="modal-subtitle">Answer all 7 components of the Pittsburgh Sleep Quality Index</p>
+
+            <div class="modal-score-preview" id="psqi-live-preview">
+                <span class="preview-label">Live Score</span>
+                <span class="preview-value" id="psqi-preview-val">0</span>
+                <span class="preview-max">/ 21</span>
+                <span class="preview-interp" id="psqi-interp">Good Sleep Quality</span>
+            </div>
+
+            <div class="modal-form modal-form-grid">
+                <!-- Component 1 -->
+                <div class="modal-field">
+                    <label><span class="comp-num">1</span> Overall sleep quality?</label>
+                    <select id="calc-sleep-qual" onchange="updatePSQIPreview()">
+                        <option value="0">Very Good</option>
+                        <option value="1">Fairly Good</option>
+                        <option value="2">Fairly Bad</option>
+                        <option value="3">Very Bad</option>
+                    </select>
+                </div>
+
+                <!-- Component 2 -->
+                <div class="modal-field">
+                    <label><span class="comp-num">2</span> Minutes to fall asleep?</label>
+                    <select id="calc-sleep-lat" onchange="updatePSQIPreview()">
+                        <option value="0">&lt; 15 mins</option>
+                        <option value="1">16 – 30 mins</option>
+                        <option value="2">31 – 60 mins</option>
+                        <option value="3">&gt; 60 mins</option>
+                    </select>
+                </div>
+
+                <!-- Component 3 -->
+                <div class="modal-field">
+                    <label><span class="comp-num">3</span> Hours of actual sleep per night?</label>
+                    <select id="calc-sleep-dur" onchange="updatePSQIPreview()">
+                        <option value="0">&gt; 7 hours</option>
+                        <option value="1">6 – 7 hours</option>
+                        <option value="2">5 – 6 hours</option>
+                        <option value="3">&lt; 5 hours</option>
+                    </select>
+                </div>
+
+                <!-- Component 4 -->
+                <div class="modal-field">
+                    <label><span class="comp-num">4</span> Sleep efficiency (time asleep ÷ time in bed)?</label>
+                    <select id="calc-sleep-eff" onchange="updatePSQIPreview()">
+                        <option value="0">&gt; 85%</option>
+                        <option value="1">75 – 84%</option>
+                        <option value="2">65 – 74%</option>
+                        <option value="3">&lt; 65%</option>
+                    </select>
+                </div>
+
+                <!-- Component 5 -->
+                <div class="modal-field">
+                    <label><span class="comp-num">5</span> Sleep disturbance frequency?</label>
+                    <select id="calc-sleep-dist" onchange="updatePSQIPreview()">
+                        <option value="0">Not during past month</option>
+                        <option value="1">Less than once a week</option>
+                        <option value="2">Once or twice a week</option>
+                        <option value="3">Three or more times a week</option>
+                    </select>
+                </div>
+
+                <!-- Component 6 -->
+                <div class="modal-field">
+                    <label><span class="comp-num">6</span> Use of sleeping medication?</label>
+                    <select id="calc-sleep-med" onchange="updatePSQIPreview()">
+                        <option value="0">Not during past month</option>
+                        <option value="1">Less than once a week</option>
+                        <option value="2">Once or twice a week</option>
+                        <option value="3">Three or more times a week</option>
+                    </select>
+                </div>
+
+                <!-- Component 7 – full width -->
+                <div class="modal-field modal-field-full">
+                    <label><span class="comp-num">7</span> Daytime dysfunction (sleepiness / lack of
+                        enthusiasm)?</label>
+                    <select id="calc-sleep-day" onchange="updatePSQIPreview()">
+                        <option value="0">No problem at all</option>
+                        <option value="1">Only a very slight problem</option>
+                        <option value="2">Somewhat of a problem</option>
+                        <option value="3">A very big problem</option>
+                    </select>
+                </div>
+
+                <div class="modal-field-full">
+                    <button type="button" class="btn-glow" onclick="calculatePSQI()">✔ Apply Score to Form</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SKIN CONDUCTANCE MODAL ===================== -->
+    <div id="skin-modal" class="modal hidden">
+        <div class="modal-content glass-panel modal-wide">
+            <span class="close-btn" onclick="closeModal('skin-modal')">&times;</span>
+            <h2>⚡ Skin Conductance Estimator</h2>
+            <p class="modal-subtitle">Answer 4 questions to estimate your galvanic skin response</p>
+
+            <div class="modal-score-preview" id="skin-live-preview">
+                <span class="preview-label">Estimated GSR</span>
+                <span class="preview-value" id="skin-preview-val">0.50</span>
+                <span class="preview-max">μS</span>
+                <span class="preview-interp" id="skin-interp">Very Low</span>
+            </div>
+
+            <div class="modal-form modal-form-grid">
+                <div class="modal-field">
+                    <label><span class="comp-num">1</span> Current palm sweat level?</label>
+                    <select id="calc-skin-sweat" onchange="updateSkinPreview()">
+                        <option value="0">No, completely dry</option>
+                        <option value="1">Slightly moist</option>
+                        <option value="2">Very sweaty</option>
+                    </select>
+                </div>
+
+                <div class="modal-field">
+                    <label><span class="comp-num">2</span> Resting heart rate?</label>
+                    <select id="calc-skin-hr" onchange="updateSkinPreview()">
+                        <option value="0">&lt; 70 bpm (Relaxed)</option>
+                        <option value="1">70 – 90 bpm (Normal)</option>
+                        <option value="2">&gt; 90 bpm (Elevated)</option>
+                    </select>
+                </div>
+
+                <div class="modal-field">
+                    <label><span class="comp-num">3</span> Current anxiety / nervousness?</label>
+                    <select id="calc-skin-anx" onchange="updateSkinPreview()">
+                        <option value="0">Not at all</option>
+                        <option value="1">Somewhat</option>
+                        <option value="2">Very much</option>
+                    </select>
+                </div>
+
+                <div class="modal-field">
+                    <label><span class="comp-num">4</span> Recent physical exertion?</label>
+                    <select id="calc-skin-exert" onchange="updateSkinPreview()">
+                        <option value="0">None / fully resting</option>
+                        <option value="1">Light activity (walking)</option>
+                        <option value="2">Intense activity (exercise)</option>
+                    </select>
+                </div>
+
+                <div class="modal-field-full">
+                    <button type="button" class="btn-glow" onclick="calculateSkin()">✔ Apply Score to Form</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+
+</html>

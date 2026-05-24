@@ -1,0 +1,13 @@
+# render.yaml – Render deployment configuration
+services:
+  - type: web
+    name: stress-detection
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MPLBACKEND
+        value: Agg
+    # The static files (HTML/CSS/JS) are mounted and served by FastAPI, no extra setup needed.
