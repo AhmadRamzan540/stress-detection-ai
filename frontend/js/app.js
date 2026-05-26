@@ -32,16 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
         analyzeBtn.disabled = true;
 
         // Read input values (Call Duration is in minutes, Screen Time is in hours and converted to minutes)
-        const callDurMinutes  = parseFloat(document.getElementById('call_dur').value) || 0;
+        const callDurMinutes = parseFloat(document.getElementById('call_dur').value) || 0;
         const screenTimeHours = parseFloat(document.getElementById('screen_time').value) || 0;
 
         const screenTimeMinutes = screenTimeHours * 60;
 
         const data = {
-            PSQI_score:       parseFloat(document.getElementById('psqi').value),
+            PSQI_score: parseFloat(document.getElementById('psqi').value),
             skin_conductance: parseFloat(document.getElementById('skin_cond').value),
-            call_duration:    callDurMinutes,    // backend expects minutes
-            screen_on_time:   screenTimeMinutes, // backend expects minutes
+            call_duration: callDurMinutes,    // backend expects minutes
+            screen_on_time: screenTimeMinutes, // backend expects minutes
         };
 
         try {
@@ -54,6 +54,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Server error');
 
             const result = await response.json();
+            // Google Analytics Custom Event
+            gtag('event', 'stress_checked', {
+                'event_category': 'Engagement',
+                'event_label': 'User Checked Stress Level'
+            });
 
             setTimeout(() => {
                 showResult(result, data);
@@ -82,19 +87,19 @@ document.addEventListener('DOMContentLoaded', () => {
         form.classList.add('hidden');
         resultContainer.classList.remove('hidden');
 
-        const resultIcon  = document.getElementById('result-icon');
+        const resultIcon = document.getElementById('result-icon');
         const resultTitle = document.getElementById('result-title');
-        const resultMsg   = document.getElementById('result-msg');
+        const resultMsg = document.getElementById('result-msg');
 
         document.getElementById('model-name').textContent = result.best_model;
-        document.getElementById('model-acc').textContent  = result.model_accuracy;
+        document.getElementById('model-acc').textContent = result.model_accuracy;
 
         // --- Score Summary Section ---
         const scoreSummary = document.getElementById('score-summary');
-        const psqiVal  = document.getElementById('psqi').value || '—';
-        const skinVal  = document.getElementById('skin_cond').value || '—';
+        const psqiVal = document.getElementById('psqi').value || '—';
+        const skinVal = document.getElementById('skin_cond').value || '—';
         const callMins = data.call_duration.toFixed(0);
-        const scrMins  = data.screen_on_time.toFixed(0);
+        const scrMins = data.screen_on_time.toFixed(0);
 
         scoreSummary.innerHTML = `
             <h3 class="summary-title">Input Summary</h3>
@@ -187,14 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ─── Modal Logic ────────────────────────────────────────────────────────────
 
-window.openModal = function(id) {
+window.openModal = function (id) {
     document.getElementById(id).classList.remove('hidden');
     // Refresh live previews when modal opens
     if (id === 'psqi-modal') updatePSQIPreview();
     if (id === 'skin-modal') updateSkinPreview();
 };
 
-window.closeModal = function(id) {
+window.closeModal = function (id) {
     document.getElementById(id).classList.add('hidden');
 };
 
@@ -207,44 +212,44 @@ window.addEventListener('click', (e) => {
 
 // ─── PSQI Live Preview ───────────────────────────────────────────────────────
 
-window.updatePSQIPreview = function() {
-    const qual  = parseInt(document.getElementById('calc-sleep-qual').value) || 0;
-    const lat   = parseInt(document.getElementById('calc-sleep-lat').value)  || 0;
-    const dur   = parseInt(document.getElementById('calc-sleep-dur').value)  || 0;
-    const eff   = parseInt(document.getElementById('calc-sleep-eff').value)  || 0;
-    const dist  = parseInt(document.getElementById('calc-sleep-dist').value) || 0;
-    const med   = parseInt(document.getElementById('calc-sleep-med').value)  || 0;
-    const day   = parseInt(document.getElementById('calc-sleep-day').value)  || 0;
+window.updatePSQIPreview = function () {
+    const qual = parseInt(document.getElementById('calc-sleep-qual').value) || 0;
+    const lat = parseInt(document.getElementById('calc-sleep-lat').value) || 0;
+    const dur = parseInt(document.getElementById('calc-sleep-dur').value) || 0;
+    const eff = parseInt(document.getElementById('calc-sleep-eff').value) || 0;
+    const dist = parseInt(document.getElementById('calc-sleep-dist').value) || 0;
+    const med = parseInt(document.getElementById('calc-sleep-med').value) || 0;
+    const day = parseInt(document.getElementById('calc-sleep-day').value) || 0;
 
     const total = qual + lat + dur + eff + dist + med + day; // 0–21
 
-    const previewVal  = document.getElementById('psqi-preview-val');
-    const interpEl    = document.getElementById('psqi-interp');
-    const previewBox  = document.getElementById('psqi-live-preview');
+    const previewVal = document.getElementById('psqi-preview-val');
+    const interpEl = document.getElementById('psqi-interp');
+    const previewBox = document.getElementById('psqi-live-preview');
 
     if (previewVal) previewVal.textContent = total;
 
     let interp = '', color = '';
-    if (total <= 5)       { interp = 'Good Sleep Quality';      color = '#10b981'; }
-    else if (total <= 10) { interp = 'Moderate Sleep Issues';   color = '#f59e0b'; }
-    else if (total <= 15) { interp = 'Poor Sleep Quality';      color = '#ef4444'; }
-    else                  { interp = 'Very Poor Sleep Quality'; color = '#b91c1c'; }
+    if (total <= 5) { interp = 'Good Sleep Quality'; color = '#10b981'; }
+    else if (total <= 10) { interp = 'Moderate Sleep Issues'; color = '#f59e0b'; }
+    else if (total <= 15) { interp = 'Poor Sleep Quality'; color = '#ef4444'; }
+    else { interp = 'Very Poor Sleep Quality'; color = '#b91c1c'; }
 
-    if (interpEl)   { interpEl.textContent = interp; interpEl.style.color = color; }
+    if (interpEl) { interpEl.textContent = interp; interpEl.style.color = color; }
     if (previewBox) { previewBox.style.borderColor = color; }
     if (previewVal) previewVal.style.color = color;
 };
 
 // ─── PSQI Calculate & Apply ──────────────────────────────────────────────────
 
-window.calculatePSQI = function() {
-    const qual  = parseInt(document.getElementById('calc-sleep-qual').value) || 0;
-    const lat   = parseInt(document.getElementById('calc-sleep-lat').value)  || 0;
-    const dur   = parseInt(document.getElementById('calc-sleep-dur').value)  || 0;
-    const eff   = parseInt(document.getElementById('calc-sleep-eff').value)  || 0;
-    const dist  = parseInt(document.getElementById('calc-sleep-dist').value) || 0;
-    const med   = parseInt(document.getElementById('calc-sleep-med').value)  || 0;
-    const day   = parseInt(document.getElementById('calc-sleep-day').value)  || 0;
+window.calculatePSQI = function () {
+    const qual = parseInt(document.getElementById('calc-sleep-qual').value) || 0;
+    const lat = parseInt(document.getElementById('calc-sleep-lat').value) || 0;
+    const dur = parseInt(document.getElementById('calc-sleep-dur').value) || 0;
+    const eff = parseInt(document.getElementById('calc-sleep-eff').value) || 0;
+    const dist = parseInt(document.getElementById('calc-sleep-dist').value) || 0;
+    const med = parseInt(document.getElementById('calc-sleep-med').value) || 0;
+    const day = parseInt(document.getElementById('calc-sleep-day').value) || 0;
 
     // True PSQI: sum of 7 component scores (each 0–3) → range 0–21
     const psqiFinal = qual + lat + dur + eff + dist + med + day;
@@ -262,10 +267,10 @@ window.calculatePSQI = function() {
 
 // ─── Skin Conductance Live Preview ──────────────────────────────────────────
 
-window.updateSkinPreview = function() {
+window.updateSkinPreview = function () {
     const sweat = parseInt(document.getElementById('calc-skin-sweat').value) || 0;
-    const hr    = parseInt(document.getElementById('calc-skin-hr').value)    || 0;
-    const anx   = parseInt(document.getElementById('calc-skin-anx').value)   || 0;
+    const hr = parseInt(document.getElementById('calc-skin-hr').value) || 0;
+    const anx = parseInt(document.getElementById('calc-skin-anx').value) || 0;
     const exert = parseInt(document.getElementById('calc-skin-exert').value) || 0;
 
     // Max raw = 2+2+2+2 = 8 → map to 0.5–6.0 μS
@@ -273,28 +278,28 @@ window.updateSkinPreview = function() {
     const skinFinal = parseFloat((0.5 + (raw / 8) * 5.5).toFixed(2));
 
     const previewVal = document.getElementById('skin-preview-val');
-    const interpEl   = document.getElementById('skin-interp');
+    const interpEl = document.getElementById('skin-interp');
     const previewBox = document.getElementById('skin-live-preview');
 
     if (previewVal) previewVal.textContent = skinFinal.toFixed(2);
 
     let interp = '', color = '';
-    if (skinFinal < 1.5)      { interp = 'Very Low (Calm)';    color = '#10b981'; }
-    else if (skinFinal < 3.0) { interp = 'Moderate';           color = '#f59e0b'; }
-    else if (skinFinal < 5.0) { interp = 'Elevated';           color = '#ef4444'; }
-    else                      { interp = 'Very High (Stressed)'; color = '#b91c1c'; }
+    if (skinFinal < 1.5) { interp = 'Very Low (Calm)'; color = '#10b981'; }
+    else if (skinFinal < 3.0) { interp = 'Moderate'; color = '#f59e0b'; }
+    else if (skinFinal < 5.0) { interp = 'Elevated'; color = '#ef4444'; }
+    else { interp = 'Very High (Stressed)'; color = '#b91c1c'; }
 
-    if (interpEl)   { interpEl.textContent = interp; interpEl.style.color = color; }
+    if (interpEl) { interpEl.textContent = interp; interpEl.style.color = color; }
     if (previewBox) { previewBox.style.borderColor = color; }
     if (previewVal) previewVal.style.color = color;
 };
 
 // ─── Skin Calculate & Apply ──────────────────────────────────────────────────
 
-window.calculateSkin = function() {
+window.calculateSkin = function () {
     const sweat = parseInt(document.getElementById('calc-skin-sweat').value) || 0;
-    const hr    = parseInt(document.getElementById('calc-skin-hr').value)    || 0;
-    const anx   = parseInt(document.getElementById('calc-skin-anx').value)   || 0;
+    const hr = parseInt(document.getElementById('calc-skin-hr').value) || 0;
+    const anx = parseInt(document.getElementById('calc-skin-anx').value) || 0;
     const exert = parseInt(document.getElementById('calc-skin-exert').value) || 0;
 
     const raw = sweat + hr + anx + exert; // max 8
